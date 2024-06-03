@@ -1,10 +1,10 @@
 ## Config
 
-Terraform module that configures a multitude of [Opsgenie resources](https://registry.terraform.io/providers/opsgenie/opsgenie/latest/docs). 
+Terraform module that configures a multitude of [Opsgenie resources](https://registry.terraform.io/providers/opsgenie/opsgenie/latest/docs).
 Many resources have cross-resource dependencies, which may be simpler to handle within a single module in certain cases, such as using YAML configurations.
 
-This module is designed to accept an input configuration map. 
-One nice way of handling this is by passing resource definitions from a YAML configuration file. 
+This module is designed to accept an input configuration map.
+One nice way of handling this is by passing resource definitions from a YAML configuration file.
 
 See below for details & examples.
 
@@ -50,7 +50,7 @@ escalations:
     condition: if-not-acked
     notify_type: default
     delay: 0
-    recipients:
+    recipient:
     - type: team
       team_name: acme.dev.some-service
 ```
