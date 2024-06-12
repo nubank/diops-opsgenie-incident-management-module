@@ -1,10 +1,10 @@
 ## Config
 
-Terraform module that configures a multitude of [Opsgenie resources](https://registry.terraform.io/providers/opsgenie/opsgenie/latest/docs). 
+Terraform module that configures a multitude of [Opsgenie resources](https://registry.terraform.io/providers/opsgenie/opsgenie/latest/docs).
 Many resources have cross-resource dependencies, which may be simpler to handle within a single module in certain cases, such as using YAML configurations.
 
-This module is designed to accept an input configuration map. 
-One nice way of handling this is by passing resource definitions from a YAML configuration file. 
+This module is designed to accept an input configuration map.
+One nice way of handling this is by passing resource definitions from a YAML configuration file.
 
 See below for details & examples.
 
@@ -197,12 +197,21 @@ service_incident_rules:
 
 ```hcl
 locals {
-  # Build a map of our various Opsgenie resources that will be used to iterate over each module
-  opsgenie_resources = merge([
-    for resource_file in fileset(path.cwd, "resources/*.yaml") : {
+  # load the config for each squad individually
+  # Temporary variable to hold the config for each squad
+  squads_configs = [
+    for resource_file in fileset(path.cwd, "squads/*/*.yaml") : {
       for k, v in yamldecode(file(resource_file)) : k => v
     }
-  ]...)
+  ]
+
+  # Build a map of our various Opsgenie resources that will be used to iterate over each module
+  # by "joining" the configs from many squads into a single map
+  opsgenie_resources = {
+    for key in distinct(flatten([for x in local.squads_configs : keys(x)])) :
+    key => flatten([
+    for m, n in local.squads_configs : n[key] if keys(n)[0] == key])
+  }
 }
 
 module "opsgenie" {
